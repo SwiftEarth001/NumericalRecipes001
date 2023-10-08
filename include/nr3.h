@@ -1,6 +1,13 @@
 #ifndef _NR3_H_
 #define _NR3_H_
 
+/*------------------------------------------------------/
+// the only edits we make are to the four #define
+//  statements below; they are commented out by
+//  default; uncommenting them when debugging can 
+//	make things easier;
+/------------------------------------------------------*/
+
 //#define _CHECKBOUNDS_ 1
 //#define _USESTDVECTOR_ 1
 //#define _USENRERRORCLASS_ 1
