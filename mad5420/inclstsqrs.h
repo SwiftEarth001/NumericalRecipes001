@@ -23,7 +23,7 @@ private:
 
     // model and data;
     double** model;
-    // pending model data
+    // pending model and data
     std::vector< std::vector<double> > pending;
 
     // solution vector and Cholesky factorization;
@@ -97,13 +97,12 @@ void IncLeastSqrs::update_data_to_model()
 {
     for (unsigned int k=0; k<pending.size(); k++) {
         // add new row to model window;
-        double** address = (double**) ( ( (unsigned long long int) model + 
-            start_offset + k ) % (nrows) );
-        for (int j=0; j<ncols; j++) { (*address)[j] = pending[k][j]; }
+        unsigned int index = (start_offset + k) % (nrows);
+        for (int j=0; j<ncols; j++) { model[k][j] = pending[k][j]; }
         // update count of data rows and starting offset;
         ndatarows = std::min(nrows, ndatarows+1);
-        if ((unsigned long long int)(address) <= (unsigned long long int)(model) + start_offset) {
-            (start_offset)++;
+        if (index <= start_offset) { 
+            start_offset = (start_offset + 1) % (nrows); 
         }
     }
 }
@@ -180,11 +179,10 @@ void IncLeastSqrs::inc_update_chelsky()
         }
         printf("\n");
     }
-    struct QRdcmp* qrfact = new struct QRdcmp(*mmat);
-    printf("%d %d\n", qrfact->n, qrfact->m);
+    QRdcmp* qrmat = new QRdcmp(*mmat);
     for (int i=0; i<N+s; i++) {
         for (int j=0; j<m; j++) {
-            printf("%f ", (qrfact->r)[i][j]);
+            printf("%f ", (qrmat->r)[i][j]);
         }
         printf("\n");
     }
@@ -192,10 +190,10 @@ void IncLeastSqrs::inc_update_chelsky()
     // write r' to Cholesky matrix;
     for (int i=0; i<m; i++) {
         for (int j=0; j<m; j++) {
-            (chelsky->el)[i][j] = (qrfact->r)[j][i];
+            (chelsky->el)[i][j] = (qrmat->r)[j][i];
         }
     }
-    for (int i=0; i<N+s; i++) {
+    for (int i=0; i<m; i++) {
         for (int j=0; j<m; j++) {
             printf("%f ", (chelsky->el)[i][j]);
         }
@@ -211,10 +209,15 @@ void IncLeastSqrs::solve()
     
     // write data to vector;
     double* B = new double[ndatarows];
+    printf("%u %d\n", start_offset, ndatarows);
     for (int index=0, i=0; i<ndatarows; i++) {
-        index = (i+start_offset) % (nrows);
+        index = (start_offset+i) % (nrows);
         B[i] = model[index][ncols-1];
     }
+    for (int k=0; k<ndatarows; k++) {
+        printf("%f ", B[k]);
+    }
+    printf("\n");
     VecDoub_I* b = new VecDoub(ndatarows, B);
     
     // initialize solution vector x;

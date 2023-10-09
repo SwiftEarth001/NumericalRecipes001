@@ -12,21 +12,26 @@
 
 #include "nr3.h"
 
-struct QRdcmp {
+class QRdcmp 
+{
+private:
 	Int n;
 	Int m;
-	MatDoub qt, r;
 	Bool sing;
+public:
+	MatDoub qt, r;
 	QRdcmp(MatDoub_I &a);
 	void solve(VecDoub_I &b, VecDoub_O &x);
 	void qtmult(VecDoub_I &b, VecDoub_O &x);
 	void rsolve(VecDoub_I &b, VecDoub_O &x);
 	void update(VecDoub_I &u, VecDoub_I &v);
 	void rotate(const Int i, const Doub a, const Doub b);
+	~QRdcmp();
 };
 
-QRdcmp::QRdcmp(MatDoub_I &a)
-	: n(a.nrows()), m(a.ncols()), qt(n,n), r(a), sing(false) {
+QRdcmp::QRdcmp(MatDoub_I &a) : 
+	n(a.nrows()), m(a.ncols()), qt(n,n), r(a), sing(false) 
+{
 	Int i,j,k;
 	VecDoub c(n), d(n);
 	Doub scale,sigma,sum,tau;
@@ -78,7 +83,6 @@ QRdcmp::QRdcmp(MatDoub_I &a)
 		r[i][i]=d[i];
 		for (j=0;j<m;j++) r[i][j]=0.0;
 	}
-	printf("%d %d\n", n, m);
 	for (int i=0; i<n; i++) {
         for (int j=0; j<m; j++) {
             printf("%f ", r[i][j]);
