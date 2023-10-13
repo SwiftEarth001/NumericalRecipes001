@@ -11,6 +11,7 @@
 /------------------------------------------------------*/
 
 #include "nr3.h"
+#include "cstmsparse.h"
 
 class QRdcmp 
 {
@@ -20,7 +21,10 @@ private:
 	Bool sing;
 public:
 	MatDoub qt, r;
+	QRdcmp(int nrow, int ncol, double* a);
 	QRdcmp(MatDoub_I &a);
+	QRdcmp(CSTMsparseMat<double> &sparsemat);
+	void factorise();
 	void solve(VecDoub_I &b, VecDoub_O &x);
 	void qtmult(VecDoub_I &b, VecDoub_O &x);
 	void rsolve(VecDoub_I &b, VecDoub_O &x);
@@ -29,8 +33,34 @@ public:
 	~QRdcmp();
 };
 
+QRdcmp::QRdcmp(int nrow, int ncol, double* a) :
+	n(nrow), m(ncol), sing(false),
+	qt(n,n), r(n,m,(Doub*)(a))
+{
+	factorise();
+}
+
 QRdcmp::QRdcmp(MatDoub_I &a) : 
-	n(a.nrows()), m(a.ncols()), qt(n,n), r(a), sing(false) 
+	n(a.nrows()), m(a.ncols()), sing(false), 
+	qt(n,n), r(a) 
+{
+	factorise();
+}
+
+QRdcmp::QRdcmp(CSTMsparseMat<double> &sparsemat) :
+	n(sparsemat.nrows()), m(sparsemat.ncols()), qt(n,n), r(n,m), sing(false) 
+{
+	for (int i=0; i<n; i++) {
+		for (int j=0; j<m; j++) {
+			r[i][j] = sparsemat.get(i,j);
+		}
+	}
+	factorise();
+}
+
+QRdcmp::~QRdcmp() {}
+
+void QRdcmp::factorise()
 {
 	Int i,j,k;
 	VecDoub c(n), d(n);
@@ -123,6 +153,7 @@ void QRdcmp::rsolve(VecDoub_I &b, VecDoub_O &x) {
 		x[i]=sum/r[i][i];
 	}
 }
+
 void QRdcmp::update(VecDoub_I &u, VecDoub_I &v) {
 	Int i,k;
 	VecDoub w(u);

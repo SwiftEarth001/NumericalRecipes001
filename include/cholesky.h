@@ -12,7 +12,9 @@ struct Cholesky {
 	MatDoub el;
 
 	Cholesky();
+	Cholesky(int nrows, double* a);
 	Cholesky(MatDoub_I &a);
+	void factorise();
 	void solve(VecDoub_I &b, VecDoub_O &x);
 	void elmult(VecDoub_I &y, VecDoub_O &x);
 	void elsolve(VecDoub_I &b, VecDoub_O &y);
@@ -21,9 +23,22 @@ struct Cholesky {
 	~Cholesky();
 };
 
-Cholesky::Cholesky() : n(0) { };
+Cholesky::Cholesky() : n(0) { }
+
+Cholesky::Cholesky(int nrows, double* a) : n(nrows), el(n,n,(Doub*)(a)) 
+{ 
+	factorise();
+}
 	
-Cholesky::Cholesky(MatDoub_I &a) : n(a.nrows()), el(a) {
+Cholesky::Cholesky(MatDoub_I &a) : n(a.nrows()), el(a) 
+{ 
+	factorise();
+}
+
+Cholesky::~Cholesky() {}
+
+void Cholesky::factorise() 
+{
 	Int i,j,k;
 	Doub sum;
 	if (el.ncols() != n) throw("need square matrix");
