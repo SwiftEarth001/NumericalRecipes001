@@ -11,7 +11,6 @@
 /------------------------------------------------------*/
 
 #include "nr3.h"
-#include "cstmsparse.h"
 
 class QRdcmp 
 {
