@@ -8,7 +8,6 @@
 #include "../../include/nr3.h"
 #include "../../include/qrdcmp.h"
 #include "../../include/cholesky.h"
-#include "../../include/cstmsparse.h"
 
 
 class IncLeastSqrs 
