@@ -116,7 +116,6 @@ void IncLeastSqrs::update_data_to_model()
         ndatarows = std::min(nrows, ndatarows+1);
         if (index <= start_offset) { start_offset = index; }
     }
-    printf("%u %d\n", start_offset, ndatarows);
 }
 
 //----------------------------------------------
@@ -171,8 +170,8 @@ void IncLeastSqrs::inc_update_chelsky()
     int N = chelsky->el.nrows();
     int s = pending.size();
     int m = ncols-1;
+    
     double* mat = new double[(N+s)*(m)];
-    printf("mat is at %p\n",(void*)(mat));
     for (int i=0; i<N; i++) {
         for (int j=0; j<m; j++) {
             mat[i*m+j] = chelsky->el[j][i]; 
@@ -184,21 +183,9 @@ void IncLeastSqrs::inc_update_chelsky()
             mat[i*m+j] = pending[ii][j];
         }
     }
-    for (int i=0; i<N+s; i++) {
-        for (int j=0; j<m; j++) {
-            printf("%f ", mat[i*m+j]);
-        }
-        printf("\n");
-    }
 
     // perform Householder factorization;
     QRdcmp qrmat(N+s, m, mat);
-    for (int i=0; i<N+s; i++) {
-        for (int j=0; j<m; j++) {
-            printf("%f ", (qrmat.r)[i][j]);
-        }
-        printf("\n");
-    }
     
     // write r' to Cholesky matrix;
     for (int i=0; i<m; i++) {
@@ -206,14 +193,7 @@ void IncLeastSqrs::inc_update_chelsky()
             (chelsky->el)[i][j] = (qrmat.r)[j][i];
         }
     }
-    for (int i=0; i<m; i++) {
-        for (int j=0; j<m; j++) {
-            printf("%f ", (chelsky->el)[i][j]);
-        }
-        printf("\n");
-    }
 
-    printf("mat is at %p\n",(void*)(mat));
     // delete mat above;
     delete[] mat;
 }
@@ -223,13 +203,6 @@ void IncLeastSqrs::solve()
     inc_update_chelsky();   
     update_data_to_model();
     clear_pending();
-
-    for (int i=0; i<nrows; i++) {
-        for (int j=0; j<ncols; j++) {
-            printf("%f ", model[i][j]);
-        }
-        printf("\n");
-    }
     
     // write data to vector B=A'*b;
     VecDoub B(ncols-1);

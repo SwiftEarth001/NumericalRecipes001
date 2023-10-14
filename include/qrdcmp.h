@@ -113,19 +113,6 @@ void QRdcmp::factorise()
 		r[i][i]=d[i];
 		for (j=0;j<m;j++) r[i][j]=0.0;
 	}
-	for (int i=0; i<n; i++) {
-        for (int j=0; j<m; j++) {
-            printf("%f ", r[i][j]);
-        }
-        printf("\n");
-    }
-	printf("\n");
-    for (int i=0; i<n; i++) {
-        for (int j=0; j<n; j++) {
-            printf("%f ", qt[i][j]);
-        }
-        printf("\n");
-    }
 }
 
 void QRdcmp::solve(VecDoub_I &b, VecDoub_O &x) {

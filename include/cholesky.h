@@ -2,7 +2,7 @@
 #define _CHOLESKY_H_
 
 /*------------------------------------------------------/
-// we have not made changes here;
+// we added an additional constructor;
 /------------------------------------------------------*/
 
 #include "nr3.h"
