@@ -56,7 +56,7 @@ typedef union DOUBLE_CAST {
 
 
 //---------------------------------------------------------
-// 2. function headers and inline functions
+// 2.a function headers
 //---------------------------------------------------------
 
 /*
@@ -90,6 +90,10 @@ inline auto print_FLOAT_A(const FLOAT_A &flx) {
     printf("exponent = %d\n", (signed int) ((signed char) flx.exponent));
     printf("mantissa = %u\n", flx.mantissa);   
 }
+
+//---------------------------------------------------------
+// 2.b inline functions
+//---------------------------------------------------------
 
 inline auto FLOAT_A_to_double(const FLOAT_A &flx) -> double {
     double_cast fd;

@@ -10,8 +10,7 @@
 #include "../../include/cholesky.h"
 
 
-class IncLeastSqrs 
-{
+class IncLeastSqrs {
 private:
     // window parameters;
     // total rows and columns of window;

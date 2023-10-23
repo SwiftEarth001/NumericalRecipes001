@@ -22,7 +22,6 @@ public:
 	MatDoub qt, r;
 	QRdcmp(int nrow, int ncol, double* a);
 	QRdcmp(MatDoub_I &a);
-	QRdcmp(CSTMsparseMat<double> &sparsemat);
 	void factorise();
 	void solve(VecDoub_I &b, VecDoub_O &x);
 	void qtmult(VecDoub_I &b, VecDoub_O &x);
@@ -45,19 +44,6 @@ QRdcmp::QRdcmp(MatDoub_I &a) :
 {
 	factorise();
 }
-
-QRdcmp::QRdcmp(CSTMsparseMat<double> &sparsemat) :
-	n(sparsemat.nrows()), m(sparsemat.ncols()), qt(n,n), r(n,m), sing(false) 
-{
-	for (int i=0; i<n; i++) {
-		for (int j=0; j<m; j++) {
-			r[i][j] = sparsemat.get(i,j);
-		}
-	}
-	factorise();
-}
-
-QRdcmp::~QRdcmp() {}
 
 void QRdcmp::factorise()
 {
