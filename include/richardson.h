@@ -6,8 +6,8 @@
 //   using the Numerical Recipes interface;
 /------------------------------------------------------*/
 
-#include <float.h>
-#include <cmath>
+//#include <float.h>  // already included in nr3math.h
+//#include <cmath>  // already included in nr3math.h
 
 #include "nr3math.h"
 

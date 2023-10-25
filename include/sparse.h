@@ -1,3 +1,15 @@
+#ifndef _SPARSE_H_
+#define _SPARSE_H_
+
+/*------------------------------------------------------/
+// ...
+/------------------------------------------------------*/
+
+//#include <float.h>  // already included in nr3math.h
+//#include <cmath>  // already included in nr3math.h
+
+#include "nr3math.h"
+
 struct NRsparseCol
 {
 	Int nrows;
@@ -163,3 +175,6 @@ NRsparseMat & ADAT::ref() {
 ADAT::~ADAT() {
 	delete adat;
 }
+
+
+#endif /* _SPARSE_H_ */
