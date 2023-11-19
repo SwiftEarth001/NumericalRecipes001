@@ -11,6 +11,11 @@
 
 //#include <float.h>  // already included in nr3math.h
 #include "nr3math.h"
+#include "cholesky.h"
+
+#ifdef _ERROR_ANALYSIS_
+extern double* res_errs;
+#endif
 
 
 class Linbcg {
@@ -18,12 +23,17 @@ public:
 	MatDoub A;  // objective function matrix;
 	Int nrow, ncol;
 
-	MatDoub P;  // preconditioner matrix;
+	MatDoub* P;  // preconditioner matrix;
+	Cholesky* PP;
 
 	Linbcg();
 	Linbcg(MatDoub_IO &a);
+	Linbcg(MatDoub_IO &a, MatDoub* P);
     Linbcg(int n, int m, double* a);
+	Linbcg(int n, int m, double* a, MatDoub* P);
 	~Linbcg();
+
+	void assignPreconditioner(MatDoub* P);
 
 	void GDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
 		const Int norm, const Doub tol, const Int itmax);
@@ -37,19 +47,42 @@ public:
 private:
 	// virtual void asolve(VecDoub_I &b, VecDoub_O &x, const Int itrnsp);
 	virtual void atimes(VecDoub_I &x, VecDoub_O &r, const Int itrnsp);
+	virtual void psolve(VecDoub_I &r, VecDoub_O &z);
 };
+
+
+/*------------------------------------------------------/
+// 2.1 constructor and destructor routines
+/------------------------------------------------------*/
 
 Linbcg::Linbcg() {}
 
 Linbcg::Linbcg(MatDoub_IO &a) : 
-	A(a), nrow(A.nrows()), ncol(A.ncols()) {}
+	A(a), nrow(A.nrows()), ncol(A.ncols()), 
+	P(nullptr), PP(nullptr) {}
+
+Linbcg::Linbcg(MatDoub_IO &a, MatDoub* P) : 
+	A(a), nrow(A.nrows()), ncol(A.ncols()), P(P) 
+{
+	PP = new Cholesky((MatDoub_I) (*P));
+}
 
 Linbcg::Linbcg(int n, int m, double* a) : 
-	nrow(n), ncol(m), A(n, m, a) {}
+	nrow(n), ncol(m), A(n, m, a), 
+	P(nullptr), PP(nullptr) {}
+
+Linbcg::Linbcg(int n, int m, double* a, MatDoub* P) : 
+	nrow(n), ncol(m), A(n, m, a), P(P) 
+{
+	PP = new Cholesky((MatDoub_I) (*P));
+}
 
 Linbcg::~Linbcg() {}
 
 
+/*------------------------------------------------------/
+// 2.2 ancillary routines
+/------------------------------------------------------*/
 
 void Linbcg::atimes(VecDoub_I &x, VecDoub_O &r, const Int itrnsp)
 {
@@ -60,6 +93,25 @@ void Linbcg::atimes(VecDoub_I &x, VecDoub_O &r, const Int itrnsp)
 		}
 	}
 }
+
+void Linbcg::psolve(VecDoub_I &r, VecDoub_O &z) 
+{
+
+}
+
+void Linbcg::assignPreconditioner(MatDoub* PC)
+{
+	P = PC;
+	if (PP != nullptr) {
+		delete PP;
+	}
+	PP = new Cholesky((MatDoub_I) (*P));
+}
+
+
+/*------------------------------------------------------/
+// 2.3 gradient descent routines
+/------------------------------------------------------*/
 
 void Linbcg::GDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
 	const Int norm, const Doub tol, const Int itmax)
@@ -72,30 +124,52 @@ void Linbcg::GDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
 	*iter = 0;
 	while ( (abs(*err) > tol) && (++*iter < itmax) ) {
 		// calculate residual r=b-Ax;
-		atimes(x, r, 0);
+		atimes(x, r, 0);  // this is momentarily r=Ax
 		for (int k=0; k<n; k++) {
-			r[k] = b[k] - r[k];
+			r[k] = b[k] - r[k];  // this will give r=b-Ax
 		}
 
 		// update alpha;
 		alphk=0;
-		for (int k=0; k<n; k++) {
-			alphk += r[k]*r[k];
-		}
-		atimes(r, ar, 0);
-		Doub denom = 0;
-		for (int k=0; k<n; k++) {
-			denom += r[k]*ar[k];
-		}
-		alphk = alphk / denom;
-		
-		// update x;
-		for (int k=0; k<n; k++) {
-			x[k] = x[k] + alphk*r[k];
+		if (P == nullptr) {
+			// without preconditioner P;
+			for (int k=0; k<n; k++) {
+				alphk += r[k]*r[k];
+			}
+			atimes(r, ar, 0);
+			Doub denom = 0;
+			for (int k=0; k<n; k++) {
+				denom += r[k]*ar[k];
+			}
+			alphk = alphk / denom;
+			// update x;
+			for (int k=0; k<n; k++) {
+				x[k] = x[k] + alphk*r[k];
+			}
+		} else {
+			// with preconditioner P;
+			VecDoub z(n), az(n);
+			PP->elsolve(r, z);
+			for (int k=0; k<n; k++) {
+				alphk += z[k]*r[k];
+			}
+			atimes(z, az, 0);
+			Doub denom = 0;
+			for (int k=0; k<n; k++) {
+				denom += z[k]*az[k];
+			}
+			alphk = alphk / denom;
+			// update x;
+			for (int k=0; k<n; k++) {
+				x[k] = x[k] + alphk*z[k];
+			}
 		}
 
-		// update error;
+		// update error; <-- use relative error;
 		*err = VECNORM(r, norm);
+#ifdef _ERROR_ANALYSIS_
+		res_errs[(*iter)-1] = *err;
+#endif
 	}
 }
 
@@ -140,20 +214,42 @@ void Linbcg::CGDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
 
 		// update beta;
 		betk = 0;
-		for (int k=0; k<n; k++) {
-			betk += ap[k]*r[k];
-		}
-		betk = betk / denom;  // we are not using complex values...
-
-		// update direction p;
-		for (int k=0; k<n; k++) {
-			p[k] = r[k] - betk*p[k];
+		if (P == nullptr) {
+			// without preconditioner P;
+			for (int k=0; k<n; k++) {
+				betk += ap[k]*r[k];
+			}
+			betk = betk / denom;  // we are not using complex values...
+			// update direction p;
+			for (int k=0; k<n; k++) {
+				p[k] = r[k] - betk*p[k];
+			}
+		} else {
+			// with preconditioner P;
+			VecDoub z(n);
+			PP->elsolve(r, z);
+			for (int k=0; k<n; k++) {
+				betk += ap[k]*z[k];
+			}
+			betk = betk / denom;  // we are not using complex values...
+			// update direction p;
+			for (int k=0; k<n; k++) {
+				p[k] = z[k] - betk*p[k];
+			}
 		}
 
 		// update error;
 		*err = VECNORM(r, norm);
+#ifdef _ERROR_ANALYSIS_
+		res_errs[(*iter)-1] = *err;
+#endif
 	}
 }
+
+
+/*------------------------------------------------------/
+// 2.3 alternative descent routines
+/------------------------------------------------------*/
 
 void Linbcg::GaussSouthwellsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, 
 	Doub *err, const Int norm, const Doub tol, const Int itmax) 

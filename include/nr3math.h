@@ -2,7 +2,7 @@
 #define _NR3MATH_H_
 
 /*--------------------------------------------------------/
-// we add in custom inline macros below;
+// we add in custom inline routines below;
 /--------------------------------------------------------*/
 
 //#include <cmath>  // already included in nr3.h
@@ -32,7 +32,7 @@ inline auto VECNORM(VecDoub &sx, Int norm) -> Doub {
 }
 
 /*--------------------------------------------------------/
-// fin custom inline macros;
+// fin custom inline routines;
 /--------------------------------------------------------*/
 
 

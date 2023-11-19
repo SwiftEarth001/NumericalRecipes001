@@ -35,7 +35,7 @@ Cholesky::Cholesky(MatDoub_I &a) : n(a.nrows()), el(a)
 	factorise();
 }
 
-Cholesky::~Cholesky() {}
+Cholesky::~Cholesky() { }
 
 void Cholesky::factorise() 
 {
@@ -55,7 +55,8 @@ void Cholesky::factorise()
 	for (i=0;i<n;i++) for (j=0;j<i;j++) el[j][i] = 0.;
 }
 
-void Cholesky::solve(VecDoub_I &b, VecDoub_O &x) {
+void Cholesky::solve(VecDoub_I &b, VecDoub_O &x) 
+{
 	Int i,k;
 	Doub sum;
 	if (b.size() != n || x.size() != n) throw("bad lengths in Cholesky");
@@ -69,7 +70,8 @@ void Cholesky::solve(VecDoub_I &b, VecDoub_O &x) {
 	}		
 }
 
-void Cholesky::elmult(VecDoub_I &y, VecDoub_O &b) {
+void Cholesky::elmult(VecDoub_I &y, VecDoub_O &b) 
+{
 	Int i,j;
 	if (b.size() != n || y.size() != n) throw("bad lengths");
 	for (i=0;i<n;i++) {
@@ -78,7 +80,8 @@ void Cholesky::elmult(VecDoub_I &y, VecDoub_O &b) {
 	}
 }
 
-void Cholesky::elsolve(VecDoub_I &b, VecDoub_O &y) {
+void Cholesky::elsolve(VecDoub_I &b, VecDoub_O &y) 
+{
 	Int i,j;
 	Doub sum;
 	if (b.size() != n || y.size() != n) throw("bad lengths");
@@ -88,7 +91,8 @@ void Cholesky::elsolve(VecDoub_I &b, VecDoub_O &y) {
 	}
 }
 
-void Cholesky::inverse(MatDoub_O &ainv) {
+void Cholesky::inverse(MatDoub_O &ainv) 
+{
 	Int i,j,k;
 	Doub sum;
 	ainv.resize(n,n);
@@ -104,7 +108,8 @@ void Cholesky::inverse(MatDoub_O &ainv) {
 	}				
 }
 
-Doub Cholesky::logdet() {
+Doub Cholesky::logdet() 
+{
 	Doub sum = 0.;
 	for (Int i=0; i<n; i++) sum += log(el[i][i]);
 	return 2.*sum;
