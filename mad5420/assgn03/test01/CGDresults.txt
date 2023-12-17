@@ -1,0 +1,8 @@
+test01 :: CGD :: NoP :: Backtracking :: iterations: 0 :: time: 0 (ms) :: 5.000000 0.000000 
+test01 :: CGD :: NoP :: WolfePowellS :: iterations: 0 :: time: 0 (ms) :: 5.000000 0.000000 
+test01 :: CGD :: NoP :: WolfePowellS :: iterations: 1 :: time: 0 (ms) :: 0.001088 0.001088 
+test01 :: CGD :: NoP :: WolfePowellS :: iterations: 1 :: time: 0 (ms) :: 0.001088 0.001088 
+test01 :: CGD :: NoP :: WolfePowellS :: iterations: 1 :: time: 0 (ms) :: 0.001088 0.001088 
+test01 :: CGD :: NoP :: WolfePowellS :: iterations: 1 :: time: 0 (ms) :: 0.001088 0.001088 
+test01 :: CGD :: NoP :: WolfePowellS :: iterations: 7 :: time: 0 (ms) :: 0.001686 0.000959 
+test01 :: CGD :: NoP :: WolfePowellS :: iterations: 9 :: time: 0 (ms) :: -0.000047 -0.000324 

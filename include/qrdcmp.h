@@ -19,35 +19,37 @@ private:
 	Int m;
 	Bool sing;
 public:
-	MatDoub qt, r;
+	MatDoub qt, r;  // qt is Q-transpose, whereas A=QR
+	
 	QRdcmp(int nrow, int ncol, double* a);
 	QRdcmp(MatDoub_I &a);
+	~QRdcmp();
+	
 	void factorise();
+
 	void solve(VecDoub_I &b, VecDoub_O &x);
 	void qtmult(VecDoub_I &b, VecDoub_O &x);
+	void qmult(VecDoub_I &b, VecDoub_O &x);
 	void rsolve(VecDoub_I &b, VecDoub_O &x);
+	void rtsolve(VecDoub_I &b, VecDoub_O &x);
+	
 	void update(VecDoub_I &u, VecDoub_I &v);
 	void rotate(const Int i, const Doub a, const Doub b);
-	~QRdcmp();
 };
 
 QRdcmp::QRdcmp(int nrow, int ncol, double* a) :
 	n(nrow), m(ncol), sing(false),
-	qt(n,n), r(n,m,(Doub*)(a))
-{
-	factorise();
-}
+	qt(n,n), r(n,m,(Doub*)(a)) { }
 
 QRdcmp::QRdcmp(MatDoub_I &a) : 
 	n(a.nrows()), m(a.ncols()), sing(false), 
-	qt(n,n), r(a) 
-{
-	factorise();
-}
+	qt(n,n), r(a) { }
+
+QRdcmp::~QRdcmp() { }
 
 void QRdcmp::factorise()
 {
-	Int i,j,k;
+	int i,j,k;
 	VecDoub c(n), d(n);
 	Doub scale,sigma,sum,tau;
 	
@@ -95,7 +97,6 @@ void QRdcmp::factorise()
 		for (j=0;j<i;j++) r[i][j]=0.0;
 	}
 	for (i=m;i<n;i++) {
-		r[i][i]=d[i];
 		for (j=0;j<m;j++) r[i][j]=0.0;
 	}
 }
@@ -106,24 +107,47 @@ void QRdcmp::solve(VecDoub_I &b, VecDoub_O &x) {
 }
 
 void QRdcmp::qtmult(VecDoub_I &b, VecDoub_O &x) {
-	Int i,j;
+	int i,j;
 	Doub sum;
 	for (i=0;i<n;i++) {
-		sum = 0.;
+		sum = 0.0;
 		for (j=0;j<n;j++) sum += qt[i][j]*b[j];
 		x[i] = sum;
 	}
 }
 
+void QRdcmp::qmult(VecDoub_I &b, VecDoub_O &x) {
+	int i,j;
+	Doub sum;
+	for (i=0;i<n;i++) {
+		sum = 0.0;
+		for (j=0;j<n;j++) sum += qt[j][i]*b[j];
+		x[i] = sum;
+	}
+}
+
 void QRdcmp::rsolve(VecDoub_I &b, VecDoub_O &x) {
-	Int i,j;
+	int i,j;
 	Doub sum;
 	if (sing) throw("attempting solve in a singular QR");
-	for (i=n-1;i>=0;i--) {
+	for (i=m-1;i>=0;i--) {
 		sum=b[i];
-		for (j=i+1;j<n;j++) sum -= r[i][j]*x[j];
+		for (j=i+1;j<m;j++) sum -= r[i][j]*x[j];
 		x[i]=sum/r[i][i];
 	}
+	for (i=m;i<n;i++) { x[i]=0.0; }
+}
+
+void QRdcmp::rtsolve(VecDoub_I &b, VecDoub_O &x) {
+	int i,j;
+	Doub sum;
+	if (sing) throw("attempting solve in a singular QR");
+	for (i=0;i<m;i++) {
+		sum=b[i];
+		for (j=i-1;j>=0;j--) sum -= r[j][i]*x[j];
+		x[i]=sum/r[i][i];
+	}
+	for (i=m;i<n;i++) { x[i]=0.0; }
 }
 
 void QRdcmp::update(VecDoub_I &u, VecDoub_I &v) {

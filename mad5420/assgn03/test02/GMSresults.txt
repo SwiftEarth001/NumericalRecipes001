@@ -1,0 +1,6 @@
+test02 :: GMS :: WolfePowell :: iterations: 100 :: time: 0 (ms) :: 1.000000 1.000000 
+test02 :: GMS :: WolfePowell :: iterations: 100 :: time: 0 (ms) :: 1.000000 1.000000 
+test02 :: GMS :: WolfePowell :: iterations: 100 :: time: 0 (ms) :: 1.000000 1.000000 
+test02 :: GMS :: WolfePowell :: iterations: 100 :: time: 0 (ms) :: 1.000000 1.000000 
+test02 :: GMS :: WolfePowell :: iterations: 100 :: time: 0 (ms) :: 1.000000 1.000000 
+test02 :: GMS :: WolfePowell :: iterations: 100 :: time: 0 (ms) :: 1.000000 1.000000 

@@ -13,7 +13,7 @@
 #include "nr3math.h"
 #include "cholesky.h"
 
-#ifdef _ERROR_ANALYSIS_
+#ifdef _ERROR_ANALYSIS_RESIDUALS_
 extern double* res_errs;
 #endif
 
@@ -35,17 +35,18 @@ public:
 
 	void assignPreconditioner(MatDoub* P);
 
-	void GDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
-		const Int norm, const Doub tol, const Int itmax);
-	void CGDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
-		const Int norm, const Doub tol, const Int itmax);
+	void GDsolve(VecDoub_I &b, VecDoub_IO &x, int *iter, double *reserr, double *steperr,
+		const int norm, const double restol, const double steptol, const int itmax);
+	void CGDsolve(VecDoub_I &b, VecDoub_IO &x, int *iter, double *reserr, double *steperr,
+		const int norm, const double restol, const double steptol, const int itmax);
 	void GaussSouthwellsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, 
 		Doub *err, const Int norm, const Doub tol, const Int itmax);
-	// void PCGDsolve(VecDoub_I &b, VecDoub_IO &x, const Int itol, 
-	//	const Doub tol, const Int itmax, Int &iter, Doub &err);
+
+/* 	void PCGDsolve(VecDoub_I &b, VecDoub_IO &x, const Int itol, 
+		const Doub tol, const Int itmax, Int &iter, Doub &err); */
 
 private:
-	// virtual void asolve(VecDoub_I &b, VecDoub_O &x, const Int itrnsp);
+	virtual void asolve(VecDoub_I &b, VecDoub_O &x, const Int itrnsp);
 	virtual void atimes(VecDoub_I &x, VecDoub_O &r, const Int itrnsp);
 	virtual void psolve(VecDoub_I &r, VecDoub_O &z);
 };
@@ -77,7 +78,11 @@ Linbcg::Linbcg(int n, int m, double* a, MatDoub* P) :
 	PP = new Cholesky((MatDoub_I) (*P));
 }
 
-Linbcg::~Linbcg() {}
+Linbcg::~Linbcg() 
+{
+	// deallocating the preconditioner is presumed to be
+	//   handled by the routine calling Linbcg;
+}
 
 
 /*------------------------------------------------------/
@@ -92,6 +97,11 @@ void Linbcg::atimes(VecDoub_I &x, VecDoub_O &r, const Int itrnsp)
 			r[i] += A[i][j]*x[j]; 
 		}
 	}
+}
+
+void Linbcg::asolve(VecDoub_I &b, VecDoub_O &x, const Int itrnsp) 
+{
+
 }
 
 void Linbcg::psolve(VecDoub_I &r, VecDoub_O &z) 
@@ -113,16 +123,18 @@ void Linbcg::assignPreconditioner(MatDoub* PC)
 // 2.3 gradient descent routines
 /------------------------------------------------------*/
 
-void Linbcg::GDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
-	const Int norm, const Doub tol, const Int itmax)
+void Linbcg::GDsolve(VecDoub_I &b, VecDoub_IO &x, int *iter, double *reserr, double *steperr,
+	const int norm, const double restol, const double steptol, const int itmax)
 {
 	Int n=b.size();
 	Doub alphk;
-	VecDoub r(n), ar(n);
+	VecDoub r(n), ar(n), dx(n);
 	
-	*err = (Doub) DBL_MAX;
+	const double EPS=1.0e-07;
+	*steperr=DBL_MAX;  // for storing step size;
+	*reserr=DBL_MAX;  // initial residual error;
 	*iter = 0;
-	while ( (abs(*err) > tol) && (++*iter < itmax) ) {
+	while ( ((*reserr > restol) && (*steperr > steptol)) && (++*iter < itmax) ) {
 		// calculate residual r=b-Ax;
 		atimes(x, r, 0);  // this is momentarily r=Ax
 		for (int k=0; k<n; k++) {
@@ -142,6 +154,8 @@ void Linbcg::GDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
 				denom += r[k]*ar[k];
 			}
 			alphk = alphk / denom;
+			// update relative change in x;
+			*steperr = alphk*VECNORM(r,norm) / MAX(VECNORM(x,norm),1);
 			// update x;
 			for (int k=0; k<n; k++) {
 				x[k] = x[k] + alphk*r[k];
@@ -159,6 +173,8 @@ void Linbcg::GDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
 				denom += z[k]*az[k];
 			}
 			alphk = alphk / denom;
+			// update relative change in x;
+			*steperr = alphk*VECNORM(z,norm) / MAX(VECNORM(x,norm),1);
 			// update x;
 			for (int k=0; k<n; k++) {
 				x[k] = x[k] + alphk*z[k];
@@ -166,15 +182,15 @@ void Linbcg::GDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
 		}
 
 		// update error; <-- use relative error;
-		*err = VECNORM(r, norm);
-#ifdef _ERROR_ANALYSIS_
-		res_errs[(*iter)-1] = *err;
+		*reserr = VECNORM(r,norm) / MAX(VECNORM(b,norm),1);
+#ifdef _ERROR_ANALYSIS_RESIDUALS_
+		res_errs[(*iter)-1] = *reserr;
 #endif
 	}
 }
 
-void Linbcg::CGDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
-	const Int norm, const Doub tol, const Int itmax)
+void Linbcg::CGDsolve(VecDoub_I &b, VecDoub_IO &x, int *iter, double *reserr, double *steperr,
+	const int norm, const double restol, const double steptol, const int itmax)
 {
 	Int n=b.size();
 	Doub alphk=0, betk=0;
@@ -185,10 +201,10 @@ void Linbcg::CGDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
 	for (int k=0; k<n; k++) { r[k] = b[k] - r[k]; }
 	for (int k=0; k<n; k++) { p[k] = r[k]; }
 	
-	// get initial error;
-	*err = VECNORM(r, norm);
-	*iter = 0;
-	while ( (abs(*err) > tol) && (++*iter < itmax) ) {
+	*steperr=DBL_MAX;  // for storing step size;
+	*reserr=DBL_MAX;  // initial residual error;
+	*iter=0;
+	while ( ( (*reserr > restol) && (*steperr > steptol) ) && (++*iter < itmax) ) {
 		// update alpha;
 		alphk = 0;
 		for (int k=0; k<n; k++) {
@@ -200,6 +216,9 @@ void Linbcg::CGDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
 			denom += p[k]*ap[k];
 		}
 		alphk = alphk / denom;
+
+		// update relative change in x;
+		*steperr = alphk*VECNORM(p,2) / MAX(VECNORM(x,2),1);
 
 		// update x;
 		for (int k=0; k<n; k++) {
@@ -239,9 +258,9 @@ void Linbcg::CGDsolve(VecDoub_I &b, VecDoub_IO &x, Int *iter, Doub *err,
 		}
 
 		// update error;
-		*err = VECNORM(r, norm);
-#ifdef _ERROR_ANALYSIS_
-		res_errs[(*iter)-1] = *err;
+		*reserr = VECNORM(r, norm);
+#ifdef _ERROR_ANALYSIS_RESIDUALS
+		res_errs[(*iter)-1] = *reserr;
 #endif
 	}
 }

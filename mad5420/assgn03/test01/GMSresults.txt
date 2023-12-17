@@ -1,0 +1,8 @@
+test01 :: GMS :: WolfePowell :: iterations: 4 :: time: 0 (ms) :: 0.000031 0.000000 
+test01 :: GMS :: WolfePowell :: iterations: 4 :: time: 0 (ms) :: 0.000031 0.000000 
+test01 :: GMS :: WolfePowell :: iterations: 4 :: time: 0 (ms) :: 0.000031 0.000000 
+test01 :: GMS :: WolfePowell :: iterations: 4 :: time: 0 (ms) :: 0.000007 0.000020 
+test01 :: GMS :: WolfePowell :: iterations: 4 :: time: 0 (ms) :: 0.000007 0.000020 
+test01 :: GMS :: WolfePowell :: iterations: 4 :: time: 0 (ms) :: 0.000007 0.000020 
+test01 :: GMS :: WolfePowell :: iterations: 4 :: time: 0 (ms) :: 0.000007 0.000020 
+test01 :: GMS :: WolfePowell :: iterations: 4 :: time: 0 (ms) :: 0.000007 0.000020 

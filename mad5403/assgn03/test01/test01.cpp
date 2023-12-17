@@ -76,14 +76,16 @@ int main(int argc, char *argv[])
         VecDoub* b = new VecDoub(N, bvec);
         VecDoub* x = new VecDoub(N, bvec);  // initialize x0 to b
         int iter=0, itmax=5000;
-        double err;
+        double reserr;
+        double steperr;
 		int norm=2;  // l2 norm;
-        double tol = 10e-7;
+        double restol = 1.0e-08;
+        double steptol = 1.0e-08;
         std::ofstream test01file;
 
 
         // <--- steepest descent SD <---
-        descentMethods->GDsolve(*b, *x, &iter, &err, 2, tol, itmax);
+        descentMethods->GDsolve(*b, *x, &iter, &reserr, &steperr, 2, restol, steptol, itmax);
 
         // write results to file;
         test01file.open( SD_output_file[m] );
@@ -96,7 +98,7 @@ int main(int argc, char *argv[])
         }
         test01file << "\n";
         test01file << "iterations: " << std::to_string(iter) << "\n";
-        test01file << "error: " << std::to_string(err) << "\n";
+        test01file << "error: " << std::to_string(reserr) << "\n";
         for (int k=0; k<iter; k++) {
             test01file << std::to_string(res_errs[k]) << " ";
         }
@@ -107,7 +109,7 @@ int main(int argc, char *argv[])
 
         // <--- conjugate gradient descent CGD <---
         for (int k=0; k<N; k++) { (*x)[k] = (*b)[k]; }
-        descentMethods->CGDsolve(*b, *x, &iter, &err, 2, tol, itmax);
+        descentMethods->CGDsolve(*b, *x, &iter, &reserr, &steperr, 2, restol, steptol, itmax);
 
         // write results to file;
         test01file.open( CGD_output_file[m] );
@@ -120,7 +122,7 @@ int main(int argc, char *argv[])
         }
         test01file << "\n";
         test01file << "iterations: " << std::to_string(iter) << "\n";
-        test01file << "error: " << std::to_string(err) << "\n";
+        test01file << "error: " << std::to_string(reserr) << "\n";
         for (int k=0; k<iter; k++) {
             test01file << std::to_string(res_errs[k]) << " ";
         }

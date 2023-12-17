@@ -1,0 +1,6 @@
+test02 :: BFGS :: WolfePowell :: iterations: 47 :: time: 0 (ms) :: 1.000000 1.000000 
+test02 :: BFGS :: WolfePowell :: iterations: 47 :: time: 0 (ms) :: 1.000000 1.000000 
+test02 :: BFGS :: WolfePowell :: iterations: 47 :: time: 0 (ms) :: 1.000000 1.000000 
+test02 :: BFGS :: WolfePowell :: iterations: 47 :: time: 0 (ms) :: 1.000000 1.000000 
+test02 :: BFGS :: WolfePowell :: iterations: 47 :: time: 0 (ms) :: 1.000000 1.000000 
+test02 :: BFGS :: WolfePowell :: iterations: 47 :: time: 0 (ms) :: 1.000000 1.000000 

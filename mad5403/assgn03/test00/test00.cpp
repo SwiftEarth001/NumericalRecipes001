@@ -23,14 +23,16 @@ int main(int argc, char *argv[])
     VecDoub* b = new VecDoub(N, bvec);
     VecDoub* x = new VecDoub(N, bvec);
     int iter=0, itmax=5000;
-    double err;
+    double reserr;
+    double steperr;
     int norm=2;  // l2 norm
-    double tol = 10e-7;
+    double restol = 1.0e-08;
+    double steptol = 1.0e-08;
     std::string output_file;  // filename to record results to
     std::ofstream test00file;  // output stream to write results to
 
     // <--- steepest descent SD <---
-    descentMethods->GDsolve(*b, *x, &iter, &err, 2, tol, itmax);
+    descentMethods->GDsolve(*b, *x, &iter, &reserr, &steperr, 2, restol, steptol, itmax);
 
     // write steepest descent SD results to file;
     output_file = "results\\NOP_SD_results.txt";
@@ -44,13 +46,13 @@ int main(int argc, char *argv[])
     }
     test00file << "\n";
     test00file << "iterations: " << std::to_string(iter) << "\n";
-    test00file << "residual error: " << std::to_string(err) << "\n";
+    test00file << "residual error: " << std::to_string(reserr) << "\n";
     test00file.close();
     // >--- steepest descent SD >---
 
     // <--- conjugate gradient descent CGD <---
     for (int k=0; k<N; k++) { (*x)[k] = (*b)[k]; }
-    descentMethods->CGDsolve(*b, *x, &iter, &err, 2, tol, itmax);
+    descentMethods->CGDsolve(*b, *x, &iter, &reserr, &steperr, 2, restol, steptol, itmax);
 
     // write conjugate gradient descent CGD results to file;
     output_file = "results\\NOP_CGD_results.txt";
@@ -64,7 +66,7 @@ int main(int argc, char *argv[])
     }
     test00file << "\n";
     test00file << "iterations: " << std::to_string(iter) << "\n";
-    test00file << "residual error: " << std::to_string(err) << "\n";
+    test00file << "residual error: " << std::to_string(reserr) << "\n";
     test00file.close();
     // >--- conjugate gradient CGD >---
     
@@ -80,7 +82,7 @@ int main(int argc, char *argv[])
 
     // <--- steepest descent SD <---
     for (int k=0; k<N; k++) { (*x)[k] = (*b)[k]; }
-    descentMethods->GDsolve(*b, *x, &iter, &err, 2, tol, itmax);
+    descentMethods->GDsolve(*b, *x, &iter, &reserr, &steperr, 2, restol, steptol, itmax);
 
     // write steepest descent SD results to file;
     output_file = "results\\PJacobi_SD_results.txt";
@@ -94,13 +96,13 @@ int main(int argc, char *argv[])
     }
     test00file << "\n";
     test00file << "iterations: " << std::to_string(iter) << "\n";
-    test00file << "residual error: " << std::to_string(err) << "\n";
+    test00file << "residual error: " << std::to_string(reserr) << "\n";
     test00file.close();
     // >--- steepest descent SD >---
 
     // <--- conjugate gradient descent CGD <---
     for (int k=0; k<N; k++) { (*x)[k] = (*b)[k]; }
-    descentMethods->CGDsolve(*b, *x, &iter, &err, 2, tol, itmax);
+    descentMethods->CGDsolve(*b, *x, &iter, &reserr, &steperr, 2, restol, steptol, itmax);
 
     // write conjugate gradient descent CGD results to file;
     output_file = "results\\PJacobi_CGD_results.txt";
@@ -114,7 +116,7 @@ int main(int argc, char *argv[])
     }
     test00file << "\n";
     test00file << "iterations: " << std::to_string(iter) << "\n";
-    test00file << "residual error: " << std::to_string(err) << "\n";
+    test00file << "residual error: " << std::to_string(reserr) << "\n";
     test00file.close();
     // >--- conjugate gradient CGD >---
 
@@ -134,7 +136,7 @@ int main(int argc, char *argv[])
 
     // <--- steepest descent SD <---
     for (int k=0; k<N; k++) { (*x)[k] = (*b)[k]; }
-    descentMethods->GDsolve(*b, *x, &iter, &err, 2, tol, itmax);
+    descentMethods->GDsolve(*b, *x, &iter, &reserr, &steperr, 2, restol, steptol, itmax);
 
     // write steepest descent SD results to file;
     output_file = "results\\PSGS_SD_results.txt";
@@ -148,13 +150,13 @@ int main(int argc, char *argv[])
     }
     test00file << "\n";
     test00file << "iterations: " << std::to_string(iter) << "\n";
-    test00file << "residual error: " << std::to_string(err) << "\n";
+    test00file << "residual error: " << std::to_string(reserr) << "\n";
     test00file.close();
     // >--- steepest descent SD >---
 
     // <--- conjugate gradient descent CGD <---
     for (int k=0; k<N; k++) { (*x)[k] = (*b)[k]; }
-    descentMethods->CGDsolve(*b, *x, &iter, &err, 2, tol, itmax);
+    descentMethods->CGDsolve(*b, *x, &iter, &reserr, &steperr, 2, restol, steptol, itmax);
 
     // write conjugate gradient descent CGD results to file;
     output_file = "results\\PSGS_CGD_results.txt";
@@ -168,7 +170,7 @@ int main(int argc, char *argv[])
     }
     test00file << "\n";
     test00file << "iterations: " << std::to_string(iter) << "\n";
-    test00file << "residual error: " << std::to_string(err) << "\n";
+    test00file << "residual error: " << std::to_string(reserr) << "\n";
     test00file.close();
     // >--- conjugate gradient CGD >---
 

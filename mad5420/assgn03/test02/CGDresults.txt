@@ -1,0 +1,12 @@
+test02 :: CGD :: NoP :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 1.063132 1.129972 
+test02 :: CGD :: P :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 1.063049 1.129804 
+test02 :: CGD :: NoP :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 6.415658 41.158203 
+test02 :: CGD :: P :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 6.424796 41.267507 
+test02 :: CGD :: NoP :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 6.332788 40.095946 
+test02 :: CGD :: P :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 6.290033 39.559721 
+test02 :: CGD :: NoP :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 6.332787 40.095941 
+test02 :: CGD :: P :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 6.332786 40.095932 
+test02 :: CGD :: NoP :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 6.332788 40.095946 
+test02 :: CGD :: P :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 6.332787 40.095938 
+test02 :: CGD :: NoP :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 1.062192 1.128182 
+test02 :: CGD :: P :: WolfePowell :: iterations: 1000 :: time: 0 (ms) :: 1.062191 1.128154 
