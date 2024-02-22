@@ -57,6 +57,12 @@
         "xmemory": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "algorithm": "cpp",
+        "chrono": "cpp",
+        "forward_list": "cpp",
+        "numbers": "cpp",
+        "optional": "cpp",
+        "random": "cpp"
     }
 }
